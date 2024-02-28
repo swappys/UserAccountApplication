@@ -1,4 +1,6 @@
 import User from '../models/user';
+import jwt from 'jsonwebtoken';
+
 export const register = async(req, res)=>{
     console.log(req.body);
     const{firstName, lastName, password, email}= req.body;
@@ -37,11 +39,34 @@ try{
     //If the user exists in the database then compare the password
     user.comparePasswords(password, (err,match)=>{
         if(!match || err) return res.status(400).send("Wrong password");
-
+    //If the passwords match, generate a JWT token and send to as a response
+        let token = jwt.sign({_id: user._id},process.env.JWT_SECRET,{
+           expiresIn: '7d' 
+        });
+        res.json({token, user:{
+            firstName:user.firstName,
+            lastName:user.lastName,
+            email:user.email,
+            createdAt:user.createdAt,
+            updatedAt:user.updatedAt
+        }});
     });
 }catch(err){
     console.log("THERE WAS AN ERROR IN LOGGING IN", err);
     res.status(400).send("Signin Failed");
 }
+}
+
+export const getAllUsers = async(req, res)=>{
+    try{
+    let users = await User.find();
+    res.send(users);
+    } catch(err){
+        console.log("THERE WAS SOME ISSUE IN GETTING THE USERS");
+        res.status(400).send("Users fetch failed");
+    }
 
 }
+
+
+
