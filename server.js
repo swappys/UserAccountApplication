@@ -14,30 +14,9 @@ require("dotenv").config();
 
 const app = express();
 
-//swagger ui configuration
-const swaggerOptions = {
-  definition:{
-  openapi : "3.0.0",
-  info : {
-    title: 'User Account Application',
-    version: '1.0.0'
-  },
-  servers:[
-  {
-    url: 'http://localhost:8000/'
-  },
-  ],
-},
-apis: ["./routes/*.js"],
-};
-
-const swaggerDocs = swaggerjsDoc(swaggerOptions);
 //attaching swagger doc to the uri
 app.use("/api-docs",swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-// app.get('/swagger', (req, res) => {
-//   res.setHeader('Content-Type', 'application/json');
-//   res.send(swaggerDocument);
-// });
+
 //Database Connection
 mongoose
   .connect(process.env.DATABASE, {
