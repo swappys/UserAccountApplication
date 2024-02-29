@@ -1,6 +1,7 @@
 import User from '../models/user';
 import jwt from 'jsonwebtoken';
 
+
 export const register = async(req, res)=>{
     console.log(req.body);
     const{firstName, lastName, password, email}= req.body;
@@ -56,6 +57,7 @@ try{
     res.status(400).send("Signin Failed");
 }
 }
+
 
 export const getAllUsers = async(req, res)=>{
     try{
