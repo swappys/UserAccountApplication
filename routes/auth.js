@@ -3,13 +3,15 @@ const authenticateToken = require('../middleware/authenticateToken');
 const router = express.Router();
 
 //controllers
-import {register, login, getAllUsers, updateUser, deleteUser} from '../controllers/auth';
+import {register, login, getAllUsers, updateUser, deleteUser, refreshToken, logoutUser} from '../controllers/auth';
 
 
 router.post('/register', register);
 router.post('/login', login);
+router.post('/generateNewToken', refreshToken);
 router.get('/getAllUsers', getAllUsers);
 router.put('/updateUser/:id',authenticateToken, updateUser);
 router.delete('/deleteUser/:id',authenticateToken,deleteUser);
+router.delete('/logout',logoutUser);
 
 module.exports = router;

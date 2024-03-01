@@ -2,6 +2,7 @@ import User from '../models/user';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
+let refreshTokens=[];
 export const register = async(req, res)=>{
     console.log(req.body);
     const{firstName, lastName, password, email}= req.body;
@@ -66,10 +67,13 @@ try{
     user.comparePasswords(password, (err,match)=>{
         if(!match || err) return res.status(400).send("Wrong password");
     //If the passwords match, generate a JWT token and send to as a response
-        let token = jwt.sign({_id: user._id},process.env.JWT_SECRET,{
-           expiresIn: '7d' 
-        });
-        res.json({token, user:{
+        let token = generateAccessToken(user);
+
+    //Generate an refresh token 
+        let refreshToken = jwt.sign({_id:user._id}, process.env.REFRESH_SECRET);
+        refreshTokens.push(refreshToken);
+
+        res.json({token,refreshToken, user:{
             firstName:user.firstName,
             lastName:user.lastName,
             email:user.email,
@@ -136,6 +140,27 @@ export const deleteUser = async(req, res)=>{
         }
 }
 
+export const refreshToken = (req,res)=>{
+    const refreshToken = req.body.refreshToken;
+    if(refreshToken == null) return res.sendStatus(401);
+    if(!refreshTokens.includes(refreshToken)) return res.status(403).send("Invalid refresh token");
+    jwt.verify(refreshToken, process.env.REFRESH_SECRET, (err,user)=>{
+        if(err) return res.status(403).send("Invalid refresh token");
+        let token = generateAccessToken(user); 
+        res.json({token:token})
+    })
+}
 
+export const logoutUser = (req, res)=>{
+    refreshTokens = refreshTokens.filter(token => token !== req.body.token)
+    res.status(200).send("User logged out successfully");
+}
+
+function generateAccessToken(user){
+    const token=jwt.sign({_id: user._id},process.env.JWT_SECRET,{
+        expiresIn: '30s' 
+     });
+     return token;
+}
 
 

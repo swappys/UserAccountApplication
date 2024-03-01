@@ -61,6 +61,30 @@ paths:
           description: User with that email was not found || Wrong password || Please consider changing your password to access the system
         500:
           description: Internal Server Error
+  /generateNewToken:
+    post:
+      summary: Generate a new token
+      description: Endpoint to generate a new token.
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: refresh token
+          description: refresh token object
+          required: true
+          schema:
+            $ref: "#/definitions/UserLogin"
+      responses:
+        200:
+          description: Token generation response
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/UserUpdateResponse"
+        403:
+          description: Invalid refresh token
+        500:
+          description: Internal Server Error
 
   /updateUser/{userId}:
     put:
@@ -137,6 +161,28 @@ paths:
           description: User with that id was not found
         500:
           description: Internal Server Error
+
+  /logout:
+    delete:
+      summary: Logout a user
+      description: Endpoint to log out user.
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          description: User object that needs to be loggedOut
+          required: true
+          schema:
+            $ref: "#/definitions/UserLogout"
+      responses:
+        200:
+          description: User logged out successfully
+
+        500:
+          description: Internal Server Error
+
+
 securityDefinitions:
   BearerAuth:
     type: apiKey
@@ -189,10 +235,25 @@ definitions:
       password:
         type: string
 
+  GenerateNewToken:
+    type: object
+    properties:
+      refreshToken:
+        type: string
+
+
+  UserLogout:
+    type: object
+    properties:
+      token:
+        type: string
+
   UserLoginResponse:
     type: object
     properties:
       token:
+        type: string
+      refreshToken:
         type: string
       user:
         type: object
@@ -226,5 +287,11 @@ definitions:
     properties:
       ok:
         type: boolean
+
+  TokenGenerationResponse:
+    type: object
+    properties:
+      token:
+        type: string
       
 
