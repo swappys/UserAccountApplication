@@ -36,6 +36,31 @@ try{
     //First check if the user with the email provided exists
     let user = await User.findOne({email}).exec();
     if(!user) return res.status(400).send("User with that email was not found");
+
+    //retrieve date from the database
+    const storedDate = user.passwordChangeDate;
+    //capture the current date
+    const currentDate = new Date();
+   
+    /**  Set time to midnight for both currentDate and storedDate to consider only the 
+     * Date component without time.   
+    */
+    storedDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
+    
+    /**
+     * calculate the difference in milliseconds to get the difference and then
+     * check if it is less than the allowed limit, if not then ask user to change the
+     * password for them to successfully login
+     */
+    const dateDifference = currentDate - storedDate;
+
+    // convert milliseconds to days
+    const daysDifference = Math.floor(dateDifference / (1000 * 60 * 60 * 24));
+   
+    if(daysDifference>30){
+        return res.status(400).send("Please consider changing your password to access the system");
+    }
     
     //If the user exists in the database then compare the password
     user.comparePasswords(password, (err,match)=>{
