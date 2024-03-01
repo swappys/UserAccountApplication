@@ -122,6 +122,8 @@ paths:
       description: Endpoint to delete an existing user.
       produces:
         - application/json
+      security:
+        - BearerAuth: []
       parameters:
         - in: path
           name: userId
