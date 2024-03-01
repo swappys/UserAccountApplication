@@ -103,7 +103,7 @@ export const updateUser = async(req, res)=>{
     const user = await User.findById(userId);
 
     if(!user) return res.status(400).send("User with that id was not found");
-    if(updateBody.email) user.email = updateBody.email;
+    if(updateBody.email) return res.status(400).send("You cannot update the registered email address");
     if(updateBody.firstName) user.firstName = updateBody.firstName;
     if(updateBody.lastName) user.lastName = updateBody.lastName;
     if(updateBody.password) user.password = updateBody.password;
