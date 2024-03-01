@@ -25,6 +25,9 @@ const userSchema = new Schema({
         min: 6,
         max:64
     },
+    passwordChangeDate:{
+        type: Date
+    }
    
 },{timestamps:true});
 
@@ -45,11 +48,15 @@ userSchema.pre('save', function(next){
     // will get auto updated and you can't login with original password
 
     if(user.isModified('password')){
+
         return bcrypt.hash(user.password, 12, function(err, hash){
             if(err){
                 console.log("HASHING ERROR",err);
                 return next(err);
             }
+            const currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
+            user.passwordChangeDate=currentDate;
             user.password=hash;
             return next();
         });
