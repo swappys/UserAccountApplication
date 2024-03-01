@@ -1,6 +1,6 @@
 import User from '../models/user';
 import jwt from 'jsonwebtoken';
-
+import bcrypt from 'bcrypt';
 
 export const register = async(req, res)=>{
     console.log(req.body);
@@ -99,20 +99,17 @@ export const updateUser = async(req, res)=>{
     try{
     let userId = req.params.id;
     let updateBody = req.body;
-    console.log(userId);
     // Find the user in the database and then store it in user field
     const user = await User.findById(userId);
 
     if(!user) return res.status(400).send("User with that id was not found");
-
-    //update the user properties and save the user 
     if(updateBody.email) user.email = updateBody.email;
     if(updateBody.firstName) user.firstName = updateBody.firstName;
     if(updateBody.lastName) user.lastName = updateBody.lastName;
     if(updateBody.password) user.password = updateBody.password;
+    
 
     let userSaved = await user.save();
-    console.log(userSaved)
 
     res.json({ok:true});
     }
